@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Freshly — Grocery Store</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #faf8f4;
+      --white: #ffffff;
+      --green: #2d6a4f;
+      --green-light: #52b788;
+      --green-pale: #d8f3dc;
+      --text: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e8e4de;
+      --accent: #e76f51;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.06);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem;
+      color: var(--green);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo span { color: var(--accent); }
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .cart-btn {
+      background: var(--green);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 10px 20px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .cart-btn:hover { background: #1f4d38; }
+    .cart-count {
+      background: var(--accent);
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+    }
+
+    /* HERO */
+    .hero {
+      background: var(--white);
+      padding: 80px 24px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-tag {
+      display: inline-block;
+      background: var(--green-pale);
+      color: var(--green);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 50px;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      line-height: 1.1;
+      color: var(--text);
+      max-width: 700px;
+      margin: 0 auto 20px;
+    }
+    .hero h1 em { color: var(--green); font-style: italic; }
+    .hero p {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 480px;
+      margin: 0 auto 36px;
+      line-height: 1.7;
+    }
+    .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--green);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 14px 32px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .btn-primary:hover { background: #1f4d38; transform: translateY(-1px); }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      padding: 14px 32px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .btn-secondary:hover { border-color: var(--text); }
+
+    /* CATEGORIES */
+    .section { max-width: 1200px; margin: 0 auto; padding: 64px 24px; }
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
+    .section-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.8rem;
+    }
+    .see-all {
+      color: var(--green);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      border-bottom: 1px solid var(--green-pale);
+    }
+    .categories {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+    }
+    .cat-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .cat-card:hover { border-color: var(--green-light); transform: translateY(-2px); box-shadow: var(--shadow); }
+    .cat-card.active { border-color: var(--green); background: var(--green-pale); }
+    .cat-icon { font-size: 2rem; margin-bottom: 10px; display: block; }
+    .cat-name { font-size: 0.875rem; font-weight: 500; color: var(--text); }
+
+    /* PRODUCTS GRID */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+    }
+    .product-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .product-card:hover { box-shadow: var(--shadow); transform: translateY(-3px); }
+    .product-img {
+      width: 100%;
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5rem;
+      background: var(--cream);
+      position: relative;
+    }
+    .badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: var(--accent);
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 50px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .badge.organic { background: var(--green); }
+    .product-body { padding: 16px; }
+    .product-category { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+    .product-name { font-weight: 600; font-size: 0.95rem; margin-bottom: 4px; }
+    .product-weight { font-size: 0.8rem; color: var(--muted); margin-bottom: 12px; }
+    .product-footer { display: flex; align-items: center; justify-content: space-between; }
+    .product-price { font-size: 1.1rem; font-weight: 600; color: var(--green); }
+    .product-price span { font-size: 0.75rem; color: var(--muted); font-weight: 400; text-decoration: line-through; margin-left: 4px; }
+    .add-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--green);
+      color: white;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .add-btn:hover { background: #1f4d38; transform: scale(1.1); }
+
+    /* DETAIL MODAL */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 200;
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .overlay.open { display: flex; }
+    .modal {
+      background: var(--white);
+      border-radius: 24px;
+      max-width: 860px;
+      width: 100%;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      animation: slideUp 0.3s ease;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .modal-img {
+      background: var(--cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9rem;
+      min-height: 360px;
+    }
+    .modal-body { padding: 40px 36px; display: flex; flex-direction: column; gap: 16px; }
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 36px;
+      height: 36px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-wrapper { position: relative; max-width: 860px; width: 100%; }
+    .modal-category { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .modal-name { font-family: 'DM Serif Display', serif; font-size: 2rem; line-height: 1.2; }
+    .modal-desc { font-size: 0.9rem; color: var(--muted); line-height: 1.7; }
+    .modal-price-row { display: flex; align-items: center; gap: 12px; }
+    .modal-price { font-size: 1.8rem; font-weight: 700; color: var(--green); }
+    .modal-old-price { font-size: 1rem; color: var(--muted); text-decoration: line-through; }
+    .modal-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tag {
+      background: var(--green-pale);
+      color: var(--green);
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: 50px;
+    }
+    .qty-row { display: flex; align-items: center; gap: 16px; margin-top: 8px; }
+    .qty-control {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      overflow: hidden;
+    }
+    .qty-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 1.1rem;
+      font-weight: 500;
+      transition: background 0.15s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .qty-btn:hover { background: var(--cream); }
+    .qty-num { width: 40px; text-align: center; font-weight: 600; font-size: 0.95rem; }
+    .add-to-cart-btn {
+      flex: 1;
+      background: var(--green);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 28px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .add-to-cart-btn:hover { background: #1f4d38; }
+    .nutrition-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      background: var(--cream);
+      border-radius: 16px;
+      padding: 16px;
+    }
+    .nutr-item { text-align: center; }
+    .nutr-val { font-weight: 700; font-size: 1rem; color: var(--text); }
+    .nutr-label { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+
+    /* CART SIDEBAR */
+    .cart-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+    }
+    .cart-overlay.open { display: block; }
+    .cart-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.3);
+    }
+    .cart-sidebar {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 380px;
+      background: var(--white);
+      display: flex;
+      flex-direction: column;
+      animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100%); }
+      to   { transform: translateX(0); }
+    }
+    .cart-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .cart-title { font-family: 'DM Serif Display', serif; font-size: 1.4rem; }
+    .cart-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: transparent;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .cart-items { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .cart-item {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+    .cart-item-img { font-size: 2.5rem; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; background: var(--cream); border-radius: 10px; flex-shrink: 0; }
+    .cart-item-info { flex: 1; }
+    .cart-item-name { font-weight: 600; font-size: 0.875rem; margin-bottom: 2px; }
+    .cart-item-price { color: var(--green); font-weight: 600; font-size: 0.875rem; }
+    .cart-item-qty { font-size: 0.75rem; color: var(--muted); }
+    .remove-btn { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 1rem; padding: 4px; }
+    .remove-btn:hover { color: var(--accent); }
+    .cart-footer { padding: 24px; border-top: 1px solid var(--border); }
+    .cart-total-row { display: flex; justify-content: space-between; margin-bottom: 16px; }
+    .cart-total-label { color: var(--muted); font-size: 0.875rem; }
+    .cart-total-val { font-weight: 700; font-size: 1.2rem; }
+    .checkout-btn {
+      width: 100%;
+      background: var(--green);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 16px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .checkout-btn:hover { background: #1f4d38; }
+    .empty-cart { text-align: center; padding: 40px 20px; color: var(--muted); }
+    .empty-cart .icon { font-size: 3rem; margin-bottom: 12px; }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      z-index: 500;
+      transition: transform 0.3s ease;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      background: var(--white);
+      padding: 40px 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
+    footer strong { color: var(--green); font-family: 'DM Serif Display', serif; font-size: 1.1rem; }
+
+    /* RESPONSIVE */
+    @media (max-width: 640px) {
+      .modal { grid-template-columns: 1fr; }
+      .modal-img { min-height: 200px; font-size: 6rem; }
+      .cart-sidebar { width: 100%; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="#">🌿 Fresh<span>ly</span></a>
+    <ul class="nav-links">
+      <li><a href="#">Shop</a></li>
+      <li><a href="#">Deals</a></li>
+      <li><a href="#">About</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="cart-btn" onclick="openCart()">
+        🛒 Cart <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="hero-tag">🌱 Farm Fresh, Delivered Daily</span>
+  <h1>Good food starts with <em>fresh</em> ingredients</h1>
+  <p>Handpicked produce, organic goods, and pantry staples — delivered to your door in under 2 hours.</p>
+  <div class="hero-actions">
+    <button class="btn-primary" onclick="document.querySelector('.section').scrollIntoView({behavior:'smooth'})">Shop Now</button>
+    <button class="btn-secondary">View Deals</button>
+  </div>
+</div>
+
+<!-- CATEGORIES -->
+<div class="section">
+  <div class="section-header">
+    <h2 class="section-title">Browse Categories</h2>
+  </div>
+  <div class="categories" id="categories">
+    <div class="cat-card active" onclick="filterCategory('all', this)">
+      <span class="cat-icon">🛒</span>
+      <div class="cat-name">All</div>
+    </div>
+    <div class="cat-card" onclick="filterCategory('fruits', this)">
+      <span class="cat-icon">🍎</span>
+      <div class="cat-name">Fruits</div>
+    </div>
+    <div class="cat-card" onclick="filterCategory('vegetables', this)">
+      <span class="cat-icon">🥦</span>
+      <div class="cat-name">Vegetables</div>
+    </div>
+    <div class="cat-card" onclick="filterCategory('dairy', this)">
+      <span class="cat-icon">🥛</span>
+      <div class="cat-name">Dairy</div>
+    </div>
+    <div class="cat-card" onclick="filterCategory('bakery', this)">
+      <span class="cat-icon">🍞</span>
+      <div class="cat-name">Bakery</div>
+    </div>
+    <div class="cat-card" onclick="filterCategory('pantry', this)">
+      <span class="cat-icon">🫙</span>
+      <div class="cat-name">Pantry</div>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCTS -->
+<div class="section" style="padding-top:0">
+  <div class="section-header">
+    <h2 class="section-title">Fresh Picks</h2>
+    <a class="see-all" href="#">See all →</a>
+  </div>
+  <div class="products-grid" id="productsGrid"></div>
+</div>
+
+<!-- PRODUCT DETAIL MODAL -->
+<div class="overlay" id="overlay" onclick="closeModal(event)">
+  <div class="modal-wrapper">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal" id="modal">
+      <div class="modal-img" id="modalImg"></div>
+      <div class="modal-body">
+        <div class="modal-category" id="modalCat"></div>
+        <div class="modal-name" id="modalName"></div>
+        <div class="modal-desc" id="modalDesc"></div>
+        <div class="modal-tags" id="modalTags"></div>
+        <div class="modal-price-row">
+          <div class="modal-price" id="modalPrice"></div>
+          <div class="modal-old-price" id="modalOldPrice"></div>
+        </div>
+        <div class="nutrition-grid" id="modalNutr"></div>
+        <div class="qty-row">
+          <div class="qty-control">
+            <button class="qty-btn" onclick="changeQty(-1)">−</button>
+            <div class="qty-num" id="qtyNum">1</div>
+            <button class="qty-btn" onclick="changeQty(1)">+</button>
+          </div>
+          <button class="add-to-cart-btn" onclick="addToCartFromModal()">Add to Cart</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CART SIDEBAR -->
+<div class="cart-overlay" id="cartOverlay">
+  <div class="cart-backdrop" onclick="closeCart()"></div>
+  <div class="cart-sidebar">
+    <div class="cart-header">
+      <div class="cart-title">Your Cart</div>
+      <button class="cart-close" onclick="closeCart()">✕</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-footer">
+      <div class="cart-total-row">
+        <span class="cart-total-label">Total</span>
+        <span class="cart-total-val" id="cartTotal">$0.00</span>
+      </div>
+      <button class="checkout-btn">Proceed to Checkout →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- FOOTER -->
+<footer>
+  <strong>🌿 Freshly</strong>
+  <p style="margin-top:12px">© 2025 Freshly Grocery Store. Built with ❤️ for fresh food lovers.</p>
+</footer>
+
+<script>
+  const products = [
+    { id:1, name:"Organic Avocados", category:"fruits", emoji:"🥑", price:4.99, oldPrice:6.49, weight:"Pack of 4", badge:"Organic", tags:["Organic","Vegan","Keto"], desc:"Creamy, perfectly ripened organic Hass avocados sourced from certified family farms. Rich in healthy fats and vitamins.", nutrition:{calories:"160kcal", fat:"15g", carbs:"9g", protein:"2g"} },
+    { id:2, name:"Fresh Strawberries", category:"fruits", emoji:"🍓", price:3.49, oldPrice:null, weight:"500g punnet", badge:"Sale", tags:["Local","Seasonal"], desc:"Sweet, sun-kissed strawberries picked at peak ripeness from local farms. Perfect for smoothies, desserts, or snacking.", nutrition:{calories:"32kcal", fat:"0.3g", carbs:"8g", protein:"0.7g"} },
+    { id:3, name:"Broccoli Crown", category:"vegetables", emoji:"🥦", price:1.99, oldPrice:null, weight:"~450g each", badge:"Organic", tags:["Organic","Vegan","Superfood"], desc:"Vibrant green broccoli crowns, dense with nutrients and lightly crisp. Great steamed, roasted, or raw.", nutrition:{calories:"34kcal", fat:"0.4g", carbs:"7g", protein:"2.8g"} },
+    { id:4, name:"Whole Milk", category:"dairy", emoji:"🥛", price:2.79, oldPrice:null, weight:"1 Litre", badge:null, tags:["Fresh","Local Dairy"], desc:"Full-cream whole milk from grass-fed cows. Creamy and rich — ideal for coffee, cooking, or drinking straight.", nutrition:{calories:"149kcal", fat:"8g", carbs:"12g", protein:"8g"} },
+    { id:5, name:"Sourdough Loaf", category:"bakery", emoji:"🍞", price:5.49, oldPrice:6.99, weight:"800g loaf", badge:"Sale", tags:["Artisan","No Additives"], desc:"Slow-fermented sourdough with a crackly crust and chewy crumb. Baked fresh every morning by our in-house bakery.", nutrition:{calories:"270kcal", fat:"1g", carbs:"54g", protein:"9g"} },
+    { id:6, name:"Free Range Eggs", category:"dairy", emoji:"🥚", price:4.29, oldPrice:null, weight:"12 pack", badge:null, tags:["Free Range","High Protein"], desc:"Large free-range eggs from hens that roam freely outdoors. Rich golden yolks with superior flavour and nutrition.", nutrition:{calories:"70kcal", fat:"5g", carbs:"0g", protein:"6g"} },
+    { id:7, name:"Cherry Tomatoes", category:"vegetables", emoji:"🍅", price:2.99, oldPrice:null, weight:"250g pack", badge:"Organic", tags:["Organic","Vegan"], desc:"Bite-sized cherry tomatoes bursting with sweetness. Toss into salads, roast with herbs, or eat straight from the pack.", nutrition:{calories:"18kcal", fat:"0.2g", carbs:"4g", protein:"0.9g"} },
+    { id:8, name:"Greek Yoghurt", category:"dairy", emoji:"🫙", price:3.99, oldPrice:4.79, weight:"500g tub", badge:"Sale", tags:["Probiotic","High Protein"], desc:"Thick, tangy Greek-style yoghurt strained to perfection. High in protein and live cultures for gut health.", nutrition:{calories:"100kcal", fat:"0.7g", carbs:"6g", protein:"17g"} },
+    { id:9, name:"Basmati Rice", category:"pantry", emoji:"🍚", price:3.29, oldPrice:null, weight:"1kg bag", badge:null, tags:["Gluten-Free","Vegan"], desc:"Long-grain aromatic basmati rice aged for superior texture. Fluffy, fragrant, and perfect with curries or stir-fries.", nutrition:{calories:"360kcal", fat:"0.7g", carbs:"79g", protein:"7g"} },
+    { id:10, name:"Banana Bunch", category:"fruits", emoji:"🍌", price:1.49, oldPrice:null, weight:"~700g bunch", badge:null, tags:["Vegan","Energy Boost"], desc:"Bright yellow bananas at perfect ripeness — natural energy, potassium-rich, and great in smoothies or on toast.", nutrition:{calories:"89kcal", fat:"0.3g", carbs:"23g", protein:"1.1g"} },
+    { id:11, name:"Olive Oil Extra Virgin", category:"pantry", emoji:"🫒", price:8.99, oldPrice:10.99, weight:"500ml bottle", badge:"Sale", tags:["Cold Pressed","Organic"], desc:"Premium cold-pressed extra virgin olive oil with a peppery, fruity finish. Ideal for dressings, dipping, and cooking.", nutrition:{calories:"884kcal", fat:"100g", carbs:"0g", protein:"0g"} },
+    { id:12, name:"Croissants", category:"bakery", emoji:"🥐", price:4.49, oldPrice:null, weight:"Pack of 4", badge:null, tags:["Artisan","Butter"], desc:"Flaky, buttery all-butter croissants baked to a deep golden finish. Best enjoyed warm from the oven.", nutrition:{calories:"272kcal", fat:"14g", carbs:"32g", protein:"5g"} },
+  ];
+
+  let cart = [];
+  let currentProduct = null;
+  let currentQty = 1;
+  let activeCategory = 'all';
+
+  function renderProducts(filtered) {
+    const grid = document.getElementById('productsGrid');
+    grid.innerHTML = filtered.map(p => `
+      <div class="product-card" onclick="openModal(${p.id})">
+        <div class="product-img">
+          <span>${p.emoji}</span>
+          ${p.badge ? `<span class="badge ${p.badge==='Organic'?'organic':''}">${p.badge}</span>` : ''}
+        </div>
+        <div class="product-body">
+          <div class="product-category">${p.category}</div>
+          <div class="product-name">${p.name}</div>
+          <div class="product-weight">${p.weight}</div>
+          <div class="product-footer">
+            <div class="product-price">
+              $${p.price.toFixed(2)}
+              ${p.oldPrice ? `<span>$${p.oldPrice.toFixed(2)}</span>` : ''}
+            </div>
+            <button class="add-btn" onclick="event.stopPropagation(); quickAdd(${p.id})">+</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function filterCategory(cat, el) {
+    activeCategory = cat;
+    document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    const filtered = cat === 'all' ? products : products.filter(p => p.category === cat);
+    renderProducts(filtered);
+  }
+
+  function openModal(id) {
+    currentProduct = products.find(p => p.id === id);
+    currentQty = 1;
+    document.getElementById('qtyNum').textContent = 1;
+    document.getElementById('modalImg').textContent = currentProduct.emoji;
+    document.getElementById('modalCat').textContent = currentProduct.category.toUpperCase();
+    document.getElementById('modalName').textContent = currentProduct.name;
+    document.getElementById('modalDesc').textContent = currentProduct.desc;
+    document.getElementById('modalPrice').textContent = `$${currentProduct.price.toFixed(2)}`;
+    document.getElementById('modalOldPrice').textContent = currentProduct.oldPrice ? `$${currentProduct.oldPrice.toFixed(2)}` : '';
+    document.getElementById('modalTags').innerHTML = currentProduct.tags.map(t => `<span class="tag">${t}</span>`).join('');
+    const n = currentProduct.nutrition;
+    document.getElementById('modalNutr').innerHTML = `
+      <div class="nutr-item"><div class="nutr-val">${n.calories}</div><div class="nutr-label">Calories</div></div>
+      <div class="nutr-item"><div class="nutr-val">${n.fat}</div><div class="nutr-label">Fat</div></div>
+      <div class="nutr-item"><div class="nutr-val">${n.carbs}</div><div class="nutr-label">Carbs</div></div>
+      <div class="nutr-item"><div class="nutr-val">${n.protein}</div><div class="nutr-label">Protein</div></div>
+    `;
+    document.getElementById('overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal(e) {
+    if (!e || e.target === document.getElementById('overlay') || e.currentTarget.classList.contains('modal-close')) {
+      document.getElementById('overlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  }
+
+  function changeQty(delta) {
+    currentQty = Math.max(1, currentQty + delta);
+    document.getElementById('qtyNum').textContent = currentQty;
+  }
+
+  function addToCartFromModal() {
+    if (!currentProduct) return;
+    addToCart(currentProduct, currentQty);
+    closeModal({target: null, currentTarget: {classList: {contains: () => true}}});
+  }
+
+  function quickAdd(id) {
+    const p = products.find(p => p.id === id);
+    addToCart(p, 1);
+  }
+
+  function addToCart(product, qty) {
+    const existing = cart.find(i => i.id === product.id);
+    if (existing) existing.qty += qty;
+    else cart.push({ ...product, qty });
+    updateCartUI();
+    showToast(`✓ ${product.name} added to cart`);
+  }
+
+  function removeFromCart(id) {
+    cart = cart.filter(i => i.id !== id);
+    updateCartUI();
+  }
+
+  function updateCartUI() {
+    const count = cart.reduce((s, i) => s + i.qty, 0);
+    document.getElementById('cartCount').textContent = count;
+    const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+    document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`;
+    const el = document.getElementById('cartItems');
+    if (cart.length === 0) {
+      el.innerHTML = `<div class="empty-cart"><div class="icon">🛒</div><p>Your cart is empty</p></div>`;
+    } else {
+      el.innerHTML = cart.map(i => `
+        <div class="cart-item">
+          <div class="cart-item-img">${i.emoji}</div>
+          <div class="cart-item-info">
+            <div class="cart-item-name">${i.name}</div>
+            <div class="cart-item-qty">Qty: ${i.qty}</div>
+            <div class="cart-item-price">$${(i.price * i.qty).toFixed(2)}</div>
+          </div>
+          <button class="remove-btn" onclick="removeFromCart(${i.id})">🗑</button>
+        </div>
+      `).join('');
+    }
+  }
+
+  function openCart() { document.getElementById('cartOverlay').classList.add('open'); document.body.style.overflow='hidden'; }
+  function closeCart() { document.getElementById('cartOverlay').classList.remove('open'); document.body.style.overflow=''; }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  // Init
+  renderProducts(products);
+  updateCartUI();
+</script>
+</body>
+</html>
